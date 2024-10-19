@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Company - Equity Curve</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        header {
+            position: relative;
+            text-align: center;
+            color: white;
+        }
+        header img {
+            width: 100%;
+            height: auto;
+            max-height: 350px;
+            object-fit: cover;
+            filter: brightness(70%);
+        }
+        header h1 {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3em;
+            letter-spacing: 2px;
+            color: white;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+        }
+        nav {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+        nav a {
+            font-size: 1.2em;
+            color: white;
+            background-color: #34495e;
+            padding: 10px 20px;
+            margin-right: 10px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        nav a:hover {
+            background-color: #1abc9c;
+        }
+        .container {
+            width: 80%;
+            margin: 30px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            font-size: 2em;
+            color: #34495e;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .chart-container {
+            position: relative;
+            margin: auto;
+            width: 100%;
+            max-width: 900px;
+            background-color: #ecf0f1;
+            border: 1px solid #bdc3c7;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        footer {
+            margin-top: 40px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        footer p {
+            margin: 0;
+            font-size: 0.9em;
+        }
+        footer a {
+            color: #1abc9c;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="https://img.freepik.com/free-vector/gradient-stock-market-concept_23-2149166910.jpg" alt="Stock chart background">
+        <h1>Equity Curve</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="equity-curve.html">Equity Curve</a>
+            <a href="investment-thesis.html">Investment Thesis</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2>Equity Curve</h2>
+        <div class="chart-container">
+            <canvas id="equityChart"></canvas>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 My Company | Powered by <a href="#">Chart.js</a></p>
+    </footer>
+
+    <script>
+        // Equity curve dates
+        const labels = [
+            '2/12/2024', '2/12/2024', '2/12/2024', '2/12/2024', '2/20/2024', 
+            '2/20/2024', '2/20/2024', '2/20/2024', '2/20/2024', '2/22/2024',
+            '2/22/2024', '2/23/2024', '2/26/2024', '2/26/2024', '2/26/2024', 
+            '2/26/2024', '2/26/2024', '3/1/2024', '3/4/2024', '3/4/2024', 
+            '3/4/2024', '3/4/2024', '3/4/2024', '3/11/2024', '3/11/2024', 
+            '3/11/2024', '3/11/2024', '3/11/2024', '3/11/2024', '3/11/2024', 
+            '3/14/2024', '3/15/2024', '3/18/2024', '3/18/2024', '3/18/2024', 
+            '3/18/2024', '3/18/2024', '3/18/2024', '3/18/2024', '3/21/2024', 
+            '3/25/2024', '3/25/2024', '3/25/2024', '4/1/2024', '4/9/2024', 
+            '4/9/2024', '4/8/2024', '4/1/2024', '4/8/2024', '4/1/2024',
+            '4/8/2024', '3/25/2024', '3/26/2024', '4/2/2024', '4/1/2024', 
+            '4/4/2024', '4/8/2024', '4/12/2024', '4/10/2024', '4/12/2024',
+            '4/18/2024', '4/12/2024', '4/15/2024', '4/15/2024', '4/15/2024', 
+            '4/22/2024', '4/22/2024', '4/22/2024', '4/29/2024', '4/22/2024',
+            '4/24/2024', '4/29/2024', '4/29/2024', '4/29/2024', '5/3/2024',
+            '5/3/2024', '5/6/2024', '5/7/2024', '5/13/2024', '5/13/2024', 
+            '5/6/2024', '5/7/2024', '5/14/2024', '5/6/2024', '5/14/2024',
+            '5/15/2024', '5/15/2024', '5/20/2024', '5/28/2024', '6/3/2024', 
+            '5/16/2024', '5/20/2024', '5/28/2024', '6/3/2024', '5/28/2024',
+            '6/3/2024', '5/20/2024', '5/28/2024', '6/3/2024', '6/10/2024',
+            '6/17/2024', '6/24/2024', '7/1/2024', '7/1/2024', '7/8/2024',
+            '7/15/2024', '7/22/2024', '6/10/2024', '6/12/2024', '6/17/2024',
+            '6/26/2024', '7/2/2024', '7/8/2024', '7/15/2024', '7/22/2024',
+            '6/17/2024', '6/24/2024', '7/1/2024', '7/8/2024', '7/15/2024',
+            '7/22/2024', '6/10/2024', '6/12/2024', '6/18/2024', '6/24/2024', 
+            '6/25/2024', '7/1/2024', '7/3/2024', '7/8/2024', '7/15/2024',
+            '7/22/2024', '7/29/2024', '7/29/2024', '7/29/2024', '7/29/2024', 
+            '8/5/2024', '8/5/2024', '8/5/2024', '8/5/2024'
+            // Continue your date labels here...
+        ];
+        
+        // Data for the equity curve
+        const equityData = [
+            200000, 200440, 200608, 201063, 201811, 201930, 201910, 200857, 201361, 201631,
+            201631, 201861, 201861, 202081, 202941, 203581, 203781, 203487, 203662, 203862,
+            204508, 204984, 205688, 206028, 206694, 207326, 207886, 208264, 208397, 208605,
+            208472, 208542, 208661, 209239, 209687, 210177, 210804, 211056, 211086, 211116,
+            211026, 211407.99, 211799.99, 212311.99, 213015.99, 213039.99, 213039.99, 213647.99, 
+            214097.99, 214232.99, 214610.99, 215421.982, 215827.982, 216575.978, 216965.978, 
+            214891.978, 215656.978, 216284.978, 216809.978, 217115.978, 217574.978, 217829.978,
+            218453.978, 218963.978, 219145.978, 219565.978, 220083.978, 220233.978, 220590.978,
+            221440.978, 220732.978, 222730.978, 216844.978, 217129.978, 215393.978, 215729.978,
+            215393.978, 212173.978, 212453.978, 211837.978, 212332.978, 212722.978, 212943.978,
+            213443.978, 214553.978, 213851.978, 214751.978, 215069.978, 215667.978, 216161.978,
+            216497.978, 216945.978, 217549.978, 218125.978, 218765.978, 219125.978, 219747.978,
+            221577.978, 222945.978, 224391.978, 224859.978, 224479.938, 224763.978, 224607.978,
+            224607.978, 225804.978, 226140.978, 226632.978, 220848.978, 220986.978, 222981.978,
+            223996.978, 225046.978, 226481.978, 227147.978, 227813.978, 227253.978, 227408.978,
+            227648.978, 226752.978, 227235.978, 227523.978, 224581.978, 224416.978, 224790.978,
+            225483.978, 225813.978, 224680.978, 225252.978, 220533.978, 221919.978, 222656.978,
+            223792.978, 224092.978, 224400.978, 224592.978, 224018.978, 224623.978, 224128.978,
+            226525.978, 226525.978, 226525.978, 226525.978, 226525.978, 226525.978, 226525.978,
+            226525.978, 226525.978, 226525.978, 226525.978, 226525.978, 226525.978, 226525.978
+        
+            // Continue your data here...
+        ];
+
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'Equity Curve',
+                data: equityData,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: true,
+                tension: 0.3,
+                borderWidth: 2,
+                pointRadius: 3,
+                pointBackgroundColor: 'rgba(75, 192, 192, 1)'
+            }]
+        };
+
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        onClick: null // Disable click to hide/show datasets
+                    }
+                }
+            }
+        };
+
+        const equityChart = new Chart(
+            document.getElementById('equityChart'),
+            config
+        );
+    </script>
+
+</body>
+</html>
